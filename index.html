@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07070a">
+<title>Ghostface Calling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Creepster&family=Archivo+Narrow:wght@400;600;700&family=VT323&display=swap">
+<style>
+/* Layout: one-screen handset. Caller-ID screen on top, two huge buttons below, settings tucked in a drawer. Single dark look by choice. */
+:root {
+  --night: #07070a;
+  --plastic: #16161c;
+  --plastic-hi: #24242c;
+  --lcd: #9fd8a0;
+  --lcd-dim: #3d5a40;
+  --blood: #c4121a;
+  --blood-hi: #ff2b33;
+  --answer: #1f9e4a;
+  --answer-hi: #2fd468;
+  --bone: #ecebe6;
+  --ash: #8b8a92;
+  --display: "Creepster", "Impact", fantasy;
+  --body: "Archivo Narrow", "Arial Narrow", system-ui, sans-serif;
+  --lcd-face: "VT323", ui-monospace, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: radial-gradient(120% 80% at 50% 0%, #1a0608 0%, var(--night) 60%);
+  color: var(--bone);
+  font-family: var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px;
+  box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.wrap { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 18px; flex: 1; }
+header { text-align: center; }
+h1 {
+  font-family: var(--display); font-weight: 400; color: var(--blood-hi);
+  font-size: clamp(2.2rem, 10vw, 3rem); margin: 0; letter-spacing: 1px; line-height: 1;
+  text-shadow: 0 2px 0 #4a0003;
+}
+.sub { color: var(--ash); font-size: .95rem; margin-top: 4px; letter-spacing: .08em; text-transform: uppercase; }
+
+.screen {
+  background: #0c140d; border: 3px solid var(--plastic-hi); border-radius: 14px;
+  padding: 16px 18px; font-family: var(--lcd-face); color: var(--lcd);
+  box-shadow: inset 0 0 24px rgba(0,0,0,.8);
+  min-height: 132px; display: flex; flex-direction: column; justify-content: center; gap: 2px;
+}
+.screen .label { font-size: 1.15rem; color: var(--lcd-dim); letter-spacing: .1em; }
+.screen .who { font-size: 2.4rem; line-height: 1; }
+.screen .num { font-size: 1.4rem; }
+.screen .line { font-size: 1.5rem; color: var(--bone); min-height: 1.5em; }
+body.ringing .screen { animation: flash 1s steps(2) infinite; }
+@keyframes flash { 50% { color: #0c140d; background: var(--lcd); } }
+body.ringing .screen .label, body.ringing .screen .num { animation: inherit; }
+
+.buttons { display: grid; gap: 14px; flex: 1; grid-template-rows: 1fr 1fr; min-height: 300px; }
+.big {
+  font-family: var(--body); font-weight: 700; text-transform: uppercase; letter-spacing: .12em;
+  font-size: clamp(1.6rem, 8vw, 2.2rem); border: 0; border-radius: 22px; cursor: pointer;
+  color: var(--bone); display: flex; align-items: center; justify-content: center; gap: 14px;
+  box-shadow: 0 6px 0 rgba(0,0,0,.55), inset 0 2px 0 rgba(255,255,255,.12);
+  transition: transform .06s, box-shadow .06s, filter .2s;
+}
+.big:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.55); }
+.big:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
+.big svg { width: 1.3em; height: 1.3em; flex: none; }
+#ringBtn { background: linear-gradient(var(--blood-hi), var(--blood)); }
+#answerBtn { background: linear-gradient(var(--answer-hi), var(--answer)); }
+body.ringing #answerBtn { animation: pulse .7s ease-in-out infinite alternate; }
+@keyframes pulse { to { filter: brightness(1.35); transform: scale(1.02); } }
+body.ringing #ringBtn .txt::after { content: ""; }
+.big[disabled] { filter: grayscale(.7) brightness(.6); cursor: default; }
+
+details {
+  background: var(--plastic); border: 1px solid var(--plastic-hi); border-radius: 14px; padding: 4px 14px;
+}
+summary { cursor: pointer; padding: 10px 0; color: var(--ash); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-size: .9rem; }
+.set { display: flex; flex-direction: column; gap: 12px; padding-bottom: 14px; }
+.set label { display: flex; flex-direction: column; gap: 6px; font-size: .95rem; color: var(--bone); }
+.set input[type=text], .set select {
+  font: inherit; background: var(--night); color: var(--bone); border: 1px solid var(--plastic-hi);
+  border-radius: 10px; padding: 10px; min-height: 44px; box-sizing: border-box; width: 100%; user-select: text;
+}
+.set input[type=range] { accent-color: var(--blood-hi); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.small {
+  font: inherit; font-weight: 600; background: var(--plastic-hi); color: var(--bone); border: 0;
+  border-radius: 10px; padding: 10px 14px; min-height: 44px; cursor: pointer;
+}
+.hint { color: var(--ash); font-size: .88rem; line-height: 1.4; margin: 0; }
+.remote { font-family: var(--lcd-face); font-size: 1.25rem; color: var(--lcd); background: #0c140d; border-radius: 10px; padding: 8px 12px; }
+.chip { align-self: center; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ash); border: 1px solid var(--plastic-hi); border-radius: 999px; padding: 6px 12px; cursor: pointer; background: transparent; font-family: var(--body); min-height: 32px; }
+.chip.on { color: var(--answer-hi); border-color: var(--answer); }
+@media (prefers-reduced-motion: reduce) {
+  body.ringing .screen, body.ringing #answerBtn { animation: none; }
+  body.ringing .screen { outline: 3px solid var(--lcd); }
+}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Ghostface Calling</h1>
+    <div class="sub">Pick it up. If you dare.</div>
+  </header>
+
+  <div class="screen" aria-live="polite">
+    <div class="label" id="lcdLabel">READY</div>
+    <div class="who" id="lcdWho">NO CALLS</div>
+    <div class="num" id="lcdNum">--- --- ----</div>
+    <div class="line" id="lcdLine"></div>
+  </div>
+
+  <div class="buttons">
+    <button class="big" id="ringBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>
+      <span class="txt" id="ringTxt">Ring</span>
+    </button>
+    <button class="big" id="answerBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+      <span>Answer</span>
+    </button>
+  </div>
+
+  <button class="chip" id="armChip" type="button">Tap here once to arm the remote</button>
+
+  <details>
+    <summary>Settings (for the phone, not the victim)</summary>
+    <div class="set">
+      <p class="hint"><strong style="color:var(--bone)">Remote buttons.</strong> A Bluetooth page turner or keyboard works. Right / Down / Page Down / Enter / Space = <b>Answer</b>. Left / Up / Page Up = <b>Ring</b> (or stop). Any other key, and the play/pause button on Bluetooth headphones, does the next step: ring, then answer, then hang up. Game controllers work too: A or D-pad right = Answer, B or D-pad left = Ring.</p>
+      <div class="remote" id="remoteTest" aria-live="polite">Press a remote button to test it…</div>
+      <label for="lineTxt">What the caller says
+        <input type="text" id="lineTxt" value="What's your favorite scary movie?">
+      </label>
+      <label for="voiceSel">Voice
+        <select id="voiceSel"></select>
+      </label>
+      <label for="pitch">Voice depth <input type="range" id="pitch" min="0" max="1" step="0.05" value="0.1"></label>
+      <label for="rate">Speed <input type="range" id="rate" min="0.5" max="1.3" step="0.05" value="0.8"></label>
+      <div class="row">
+        <button class="small" id="testVoice" type="button">Test voice</button>
+        <label class="small" for="clip" style="flex-direction:row;align-items:center">Use my own recording…
+          <input type="file" id="clip" accept="audio/*" hidden>
+        </label>
+        <button class="small" id="clearClip" type="button">Use robot voice instead</button>
+      </div>
+      <p class="hint" id="clipStatus">Using Ghostface's recorded line. Load a different recording to replace it for this visit.</p>
+      <label for="autoHang" style="flex-direction:row;align-items:center;gap:10px">
+        <input type="checkbox" id="autoHang" checked style="width:22px;height:22px;accent-color:var(--blood-hi)">
+        Hang up by itself after the line
+      </label>
+      <p class="hint">Pair your phone with a Bluetooth speaker and turn the volume all the way up. Tap Ring to start; tap it again to stop. The screen tries to stay awake while this page is open.</p>
+    </div>
+  </details>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const body = document.body;
+  let ctx, ringTimer = null, ringNodes = [], state = "idle", clipURL = null, clipAudio = null;
+  const DEFAULT_CLIP = "audio/ghostface-line.mp3";
+  clipURL = DEFAULT_CLIP;
+  const dropClip = () => { if (clipURL && clipURL.startsWith("blob:")) URL.revokeObjectURL(clipURL); };
+
+  const lcd = (label, who, num, line = "") => {
+    $("lcdLabel").textContent = label; $("lcdWho").textContent = who;
+    $("lcdNum").textContent = num; $("lcdLine").textContent = line;
+  };
+
+  function audio() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+
+  // One burst of an old landline bell: two metallic tones trilled ~20 times a second.
+  function bellBurst(start, dur) {
+    const a = audio(), out = a.createGain();
+    out.gain.value = 0; out.connect(a.destination);
+    const trill = a.createOscillator(), trillGain = a.createGain();
+    trill.type = "square"; trill.frequency.value = 20;
+    trillGain.gain.value = 0.35;
+    trill.connect(trillGain); trillGain.connect(out.gain);
+    out.gain.setValueAtTime(0, start);
+    out.gain.linearRampToValueAtTime(0.4, start + 0.02);
+    out.gain.setValueAtTime(0.4, start + dur - 0.05);
+    out.gain.linearRampToValueAtTime(0, start + dur);
+    const oscs = [1180, 1460, 2390].map((f, i) => {
+      const o = a.createOscillator(), g = a.createGain();
+      o.type = i === 2 ? "sine" : "triangle"; o.frequency.value = f;
+      g.gain.value = [0.6, 0.45, 0.15][i];
+      o.connect(g); g.connect(out); o.start(start); o.stop(start + dur + 0.05);
+      return o;
+    });
+    trill.start(start); trill.stop(start + dur + 0.05);
+    ringNodes.push(out, trill, ...oscs);
+  }
+
+  function startRing() {
+    const a = audio();
+    state = "ringing"; body.classList.add("ringing");
+    $("ringTxt").textContent = "Stop";
+    lcd("INCOMING CALL", "UNKNOWN", "*** *** ****");
+    const cycle = () => {
+      const t = a.currentTime + 0.05;
+      bellBurst(t, 1.8);
+      if (navigator.vibrate) try { navigator.vibrate([1800]); } catch (e) {}
+    };
+    cycle(); ringTimer = setInterval(cycle, 3800);
+  }
+
+  function stopRing() {
+    clearInterval(ringTimer); ringTimer = null;
+    ringNodes.forEach(n => { try { n.stop ? n.stop() : n.disconnect(); } catch (e) {} });
+    ringNodes = [];
+    body.classList.remove("ringing");
+    $("ringTxt").textContent = "Ring";
+  }
+
+  function idle() {
+    stopRing();
+    try { speechSynthesis.cancel(); } catch (e) {}
+    if (clipAudio) { clipAudio.pause(); clipAudio.currentTime = 0; }
+    state = "idle"; lcd("READY", "NO CALLS", "--- --- ----");
+  }
+
+  // Receiver pickup: a clunk plus a little line hiss.
+  function pickupClick() {
+    const a = audio(), t = a.currentTime;
+    const len = Math.floor(a.sampleRate * 0.9), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      const env = i < a.sampleRate * 0.03 ? 1 : 0.06 * Math.exp(-i / (a.sampleRate * 0.5));
+      d[i] = (Math.random() * 2 - 1) * env;
+    }
+    const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    src.buffer = buf; f.type = "bandpass"; f.frequency.value = 900; g.gain.value = 0.8;
+    src.connect(f); f.connect(g); g.connect(a.destination); src.start(t);
+  }
+
+  function hangupTone() {
+    const a = audio(), t = a.currentTime;
+    [0, 0.5, 1.0].forEach(off => {
+      const o = a.createOscillator(), g = a.createGain();
+      o.frequency.value = 480; o.connect(g); g.connect(a.destination);
+      g.gain.setValueAtTime(0.12, t + off); g.gain.setValueAtTime(0, t + off + 0.25);
+      o.start(t + off); o.stop(t + off + 0.3);
+    });
+  }
+
+  function finish() {
+    if (state !== "talking") return;
+    if ($("autoHang").checked) {
+      setTimeout(() => {
+        if (state !== "talking") return;
+        lcd("CALL ENDED", "...", "*** *** ****", "Click.");
+        hangupTone();
+        setTimeout(() => { if (state === "talking") idle(); }, 2500);
+      }, 900);
+    }
+  }
+
+  let voices = [];
+  function loadVoices() {
+    try { voices = speechSynthesis.getVoices(); } catch (e) { voices = []; }
+    const sel = $("voiceSel"), keep = sel.value;
+    sel.innerHTML = "";
+    const en = voices.filter(v => /^en/i.test(v.lang));
+    (en.length ? en : voices).forEach(v => {
+      const o = document.createElement("option");
+      o.value = v.name; o.textContent = `${v.name} (${v.lang})`; sel.appendChild(o);
+    });
+    if (!sel.options.length) { const o = document.createElement("option"); o.textContent = "Default voice"; o.value = ""; sel.appendChild(o); }
+    const male = [...sel.options].find(o => /male|daniel|fred|alex|david|guy|ralph|google uk english male/i.test(o.value) && !/female/i.test(o.value));
+    sel.value = keep && [...sel.options].some(o => o.value === keep) ? keep : (male ? male.value : sel.options[0].value);
+  }
+  try { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; } catch (e) {}
+
+  function speak(text, onEnd) {
+    if (clipURL) {
+      clipAudio = clipAudio || new Audio();
+      if (!clipAudio.src.endsWith(clipURL)) clipAudio.src = clipURL;
+      clipAudio.muted = false; clipAudio.currentTime = 0; clipAudio.onended = onEnd;
+      clipAudio.play().catch(() => { const u = clipURL; clipURL = null; speak(text, onEnd); clipURL = u; });
+      return;
+    }
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const v = voices.find(v => v.name === $("voiceSel").value);
+      if (v) u.voice = v;
+      u.pitch = +$("pitch").value; u.rate = +$("rate").value; u.volume = 1;
+      u.onend = onEnd; u.onerror = onEnd;
+      speechSynthesis.speak(u);
+    } catch (e) { onEnd && onEnd(); }
+  }
+
+  function answer() {
+    if (state === "talking") return;
+    stopRing();
+    state = "talking";
+    pickupClick();
+    const line = $("lineTxt").value.trim() || "What's your favorite scary movie?";
+    lcd("CONNECTED", "UNKNOWN", "00:00");
+    let secs = 0; const clock = setInterval(() => {
+      if (state !== "talking") return clearInterval(clock);
+      secs++; $("lcdNum").textContent = "00:" + String(secs).padStart(2, "0");
+    }, 1000);
+    setTimeout(() => {
+      if (state !== "talking") return;
+      $("lcdLine").textContent = "“" + line + "”";
+      speak(line, finish);
+    }, 1100);
+  }
+
+  $("ringBtn").addEventListener("click", () => { state === "ringing" ? idle() : (idle(), startRing()); keepAwake(); });
+  $("answerBtn").addEventListener("click", () => { answer(); keepAwake(); });
+  $("testVoice").addEventListener("click", () => speak($("lineTxt").value || "What's your favorite scary movie?"));
+
+  $("clip").addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    dropClip();
+    clipURL = URL.createObjectURL(f);
+    $("clipStatus").textContent = `Using your recording: ${f.name}. Load it again if you reopen this page.`;
+    $("clearClip").textContent = "Use Ghostface's recording";
+  });
+  $("clearClip").addEventListener("click", () => {
+    const usingDefault = clipURL === DEFAULT_CLIP;
+    dropClip(); $("clip").value = "";
+    clipURL = usingDefault ? null : DEFAULT_CLIP;
+    $("clearClip").textContent = usingDefault ? "Use Ghostface's recording" : "Use robot voice instead";
+    $("clipStatus").textContent = usingDefault ? "Using the robot voice." : "Using Ghostface's recorded line.";
+  });
+
+  ["lineTxt", "pitch", "rate", "voiceSel", "autoHang"].forEach(id => {
+    const el = $(id);
+    try { const v = localStorage.getItem("gf-" + id); if (v !== null) el.type === "checkbox" ? (el.checked = v === "1") : (el.value = v); } catch (e) {}
+    el.addEventListener("change", () => { try { localStorage.setItem("gf-" + id, el.type === "checkbox" ? (el.checked ? "1" : "0") : el.value); } catch (e) {} });
+  });
+
+  // ---- Remote buttons ----
+  const ANSWER_KEYS = ["ArrowRight", "ArrowDown", "PageDown", "Enter", " ", "MediaTrackNext"];
+  const RING_KEYS = ["ArrowLeft", "ArrowUp", "PageUp", "MediaTrackPrevious"];
+  const toggleRing = () => { state === "ringing" ? idle() : (idle(), startRing()); keepAwake(); };
+  const nextStep = () => {
+    if (state === "idle") toggleRing();
+    else if (state === "ringing") answer();
+    else idle();
+  };
+  function remote(name, action) {
+    $("remoteTest").textContent = `Got "${name}" → ${action}`;
+    ({ answer: () => { answer(); keepAwake(); }, ring: toggleRing, next: nextStep })[action]();
+  }
+  document.addEventListener("keydown", e => {
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" && t.type === "text" || t.tagName === "SELECT")) return;
+    if (e.repeat || ["Shift", "Control", "Alt", "Meta"].includes(e.key)) return;
+    e.preventDefault();
+    const name = e.key === " " ? "Space" : e.key;
+    if (ANSWER_KEYS.includes(e.key)) remote(name, "answer");
+    else if (RING_KEYS.includes(e.key)) remote(name, "ring");
+    else remote(name, "next");
+  });
+
+  // Headphone / speaker play buttons only reach a page that is playing media,
+  // so arming starts a silent looping track and claims the media controls.
+  let armed = false, silent;
+  function silentWav() {
+    const rate = 8000, n = rate, buf = new ArrayBuffer(44 + n), v = new DataView(buf);
+    const w = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+    w(0, "RIFF"); v.setUint32(4, 36 + n, true); w(8, "WAVE"); w(12, "fmt ");
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true);
+    w(36, "data"); v.setUint32(40, n, true);
+    for (let i = 0; i < n; i++) v.setUint8(44 + i, 128);
+    return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+  }
+  function arm() {
+    audio(); keepAwake();
+    if (!armed) {
+      armed = true;
+      try {
+        if (clipURL) {
+          clipAudio = clipAudio || new Audio();
+          clipAudio.src = clipURL; clipAudio.preload = "auto"; clipAudio.muted = true;
+          clipAudio.play().then(() => { clipAudio.pause(); clipAudio.currentTime = 0; clipAudio.muted = false; }).catch(() => { clipAudio.muted = false; });
+        }
+      } catch (e) {}
+      try {
+        silent = new Audio(silentWav()); silent.loop = true; silent.volume = 0.01;
+        silent.play().catch(() => {});
+        if ("mediaSession" in navigator) {
+          navigator.mediaSession.metadata = new MediaMetadata({ title: "Unknown caller", artist: "Ghostface" });
+          const h = (name, action) => { try { navigator.mediaSession.setActionHandler(name, () => { silent.play().catch(() => {}); remote(name, action); }); } catch (e) {} };
+          h("play", "next"); h("pause", "next"); h("nexttrack", "answer"); h("previoustrack", "ring");
+        }
+      } catch (e) {}
+    }
+    $("armChip").textContent = "Remote armed";
+    $("armChip").classList.add("on");
+  }
+  $("armChip").addEventListener("click", arm);
+  ["ringBtn", "answerBtn"].forEach(id => $(id).addEventListener("click", arm));
+
+  // Game controllers (Gamepad API): A / D-pad right or down = answer, B / D-pad left or up = ring, anything else = next step.
+  const padPrev = {};
+  function pollPads() {
+    let pads = [];
+    try { pads = navigator.getGamepads ? [...navigator.getGamepads()] : []; } catch (e) {}
+    pads.forEach(p => {
+      if (!p) return;
+      const prev = padPrev[p.index] || [];
+      p.buttons.forEach((b, i) => {
+        if (b.pressed && !prev[i]) {
+          const action = [0, 13, 15].includes(i) ? "answer" : [1, 12, 14].includes(i) ? "ring" : "next";
+          remote("controller button " + i, action);
+        }
+      });
+      padPrev[p.index] = p.buttons.map(b => b.pressed);
+    });
+    requestAnimationFrame(pollPads);
+  }
+  window.addEventListener("gamepadconnected", e => { $("remoteTest").textContent = "Controller connected: " + e.gamepad.id; });
+  requestAnimationFrame(pollPads);
+
+  let lock = null;
+  async function keepAwake() {
+    try { if (!lock && navigator.wakeLock) { lock = await navigator.wakeLock.request("screen"); lock.addEventListener("release", () => lock = null); } } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") keepAwake(); });
+})();
+</script>
+</body>
+</html>
